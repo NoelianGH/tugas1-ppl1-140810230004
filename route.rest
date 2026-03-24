@@ -1,5 +1,10 @@
 GET http://localhost:3000/users
 
-###
+####
+POST http://localhost:3000/users
 
-GET X-Http-Method-Override: http://local
+####
+PATCH http://localhost:3000/users
+
+####
+DELETE http://localhost:3000/users
