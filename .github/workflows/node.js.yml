@@ -24,8 +24,4 @@ jobs:
       - name: Unit Testing (CI)
         run: npm test -- --watchAll=false
       - name: Security Scan (CS)
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }} # Optional: skip if you don't have a token, or use 'npm audit'
-        with:
-          command: monitor
+        run: npm audit --audit-level=high
