@@ -1,10 +1,7 @@
 FROM node:18
-
 WORKDIR /app
-
 COPY package*.json ./
-RUN npm install
-
+RUN npm install --only=production
 COPY . .
-
-CMD ["node", "src/index.js"]
+EXPOSE 3000
+CMD ["node", "server.js"]

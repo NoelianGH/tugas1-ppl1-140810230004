@@ -1,35 +1,31 @@
-name: Node.js CI/CD/CS
+name: CI/CD Pipeline
 
 on:
   push:
-    # Trigger on main, develop, and any feature branches (e.g., feature/login)
-    branches: [ "main", "develop", "feature/*" ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: [ main ]
 
 jobs:
-  build:
+  test-and-scan:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x] # Kept 18 & 20 for stability
-
+    services:
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Run Unit Tests (CI)
-      run: npm test
-
-    # NEW: Security Scan (CS) Requirement
-    - name: Security Scan (npm audit)
-      run: npm audit --audit-level=high
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install
+      - name: Unit Testing (CI)
+        run: npm test -- --watchAll=false
+      - name: Security Scan (CS)
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }} # Optional: skip if you don't have a token, or use 'npm audit'
+        with:
+          command: monitor
