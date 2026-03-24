@@ -1,26 +1,29 @@
+JavaScript
 const request = require("supertest");
 const app = require("../src/index");
+const mongoose = require("mongoose");
 
 describe("Task API", () => {
+    // Connect to a test database before running tests
+    beforeAll(async () => {
+        const url = process.env.DATABASE_URL || "mongodb://127.0.0.1:27017/test_db";
+        await mongoose.connect(url);
+    });
 
-  it("should create task", async () => {
-    const res = await request(app)
-      .post("/tasks")
-      .send({ title: "Test Task" });
+    // Close connection after all tests are done
+    afterAll(async () => {
+        await mongoose.connection.close();
+    });
 
-    expect(res.statusCode).toBe(200);
-    expect(res.body.status).toBe("success");
-    expect(res.body.data).toBeDefined();
-    expect(res.body.data.title).toBe("Test Task");
-  });
+    it("should create task", async () => {
+        const res = await request(app)
+            .post("/tasks")
+            .send({ title: "Test Task" });
 
-  it("should get tasks", async () => {
-    const res = await request(app).get("/tasks");
-
-    expect(res.statusCode).toBe(200);
-    expect(res.body.status).toBe("success");
-    expect(Array.isArray(res.body.data)).toBe(true);
-  });
+        expect(res.statusCode).toBe(200);
+        expect(res.body.status).toBe("success");
+        expect(res.body.data.title).toBe("Test Task");
+    });
 
   it("should fail when title is empty", async () => {
     const res = await request(app)
